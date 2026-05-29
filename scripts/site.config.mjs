@@ -19,7 +19,7 @@ const ICON = {
 export const SITE = {
   name: '本地 PDF 工具箱',
   // 部署前改成你的真实域名（无结尾斜杠）
-  domain: 'https://your-domain.com',
+  domain: 'https://pdf.bodhi.tools',
 };
 
 // 全站通用 FAQ
