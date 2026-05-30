@@ -77,6 +77,7 @@ export function mountSplit(container: HTMLElement): void {
   function setBtnLabel() {
     btn.innerHTML = `${icons.split}${mode === 'extract' ? '提取页面' : '拆成单页并打包'}`;
   }
+  setBtnLabel(); // 初始就显示文字(禁用态也要看得见,不能是空按钮)
 
   function showOptions() {
     opts.innerHTML = `
