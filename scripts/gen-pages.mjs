@@ -133,6 +133,7 @@ const page = (bodyInner, headOpts) => `<!doctype html>
 </head>
 <body>
 ${header()}
+  <a href="https://bodhi.tools" class="home-fab" aria-label="返回 bodhi.tools 主页">← bodhi.tools</a>
 ${bodyInner}
 ${footer()}
   <script type="module" src="/src/main.ts"></script>
