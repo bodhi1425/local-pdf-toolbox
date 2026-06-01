@@ -30,6 +30,7 @@ const head = ({ title, description, keywords, canonical, jsonld }) => `
   <meta property="og:description" content="${description}" />
   <meta property="og:url" content="${canonical}" />
   <meta name="twitter:card" content="summary" />
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4338726b0b084af88125b1047cb29bdf"}'></script>
 ${jsonld.map((o) => `  <script type="application/ld+json">${JSON.stringify(o)}</script>`).join('\n')}`;
 
 const header = () => `
