@@ -9,13 +9,16 @@
   <meta name="description" content="免费在线提取 PDF 指定页码生成新文件，或把每一页拆成单独 PDF 并打包下载。全部本地完成，文件不上传，无水印。" />
   <meta name="keywords" content="PDF拆分,PDF提取页面,PDF分割,在线拆分PDF,PDF按页拆分,提取PDF某几页" />
   <link rel="canonical" href="https://pdf.bodhi.tools/split/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://pdf.bodhi.tools/split/" />
+  <link rel="alternate" hreflang="en" href="https://pdf.bodhi.tools/en/split/" />
+  <link rel="alternate" hreflang="x-default" href="https://pdf.bodhi.tools/en/split/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="PDF 拆分 / 提取页面 — 免费在线分割 PDF，文件不上传" />
   <meta property="og:description" content="免费在线提取 PDF 指定页码生成新文件，或把每一页拆成单独 PDF 并打包下载。全部本地完成，文件不上传，无水印。" />
   <meta property="og:url" content="https://pdf.bodhi.tools/split/" />
   <meta name="twitter:card" content="summary" />
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4338726b0b084af88125b1047cb29bdf"}'></script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"PDF 拆分 / 提取页面","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"},"description":"免费在线提取 PDF 指定页码生成新文件，或把每一页拆成单独 PDF 并打包下载。全部本地完成，文件不上传，无水印。"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"PDF 拆分 / 提取页面","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"免费在线提取 PDF 指定页码生成新文件，或把每一页拆成单独 PDF 并打包下载。全部本地完成，文件不上传，无水印。"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"怎么只提取其中几页？","acceptedAnswer":{"@type":"Answer","text":"在“提取指定页面”里填页码即可，例如 1-3,5,8-10，用逗号分隔、连字符表示区间。"}},{"@type":"Question","name":"能把每页拆成单独 PDF 吗？","acceptedAnswer":{"@type":"Answer","text":"可以，选“每页拆成单独文件”，会把每一页导出为独立 PDF 并打包成 ZIP。"}},{"@type":"Question","name":"我的文件真的不会被上传吗？","acceptedAnswer":{"@type":"Answer","text":"是的。本工具使用浏览器内置能力在你的设备本地处理文件，全程不向任何服务器发送文件内容。你可以打开浏览器开发者工具的“网络（Network）”面板验证：处理过程中不会出现上传你文件的请求。"}},{"@type":"Question","name":"需要收费或注册吗？有次数限制吗？","acceptedAnswer":{"@type":"Answer","text":"完全免费，不限处理次数，也不要求注册登录。文件大小仅受设备内存限制，超大文件建议在电脑上处理。"}}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://pdf.bodhi.tools/"},{"@type":"ListItem","position":2,"name":"PDF 拆分 / 提取页面","item":"https://pdf.bodhi.tools/split/"}]}</script>
 </head>
@@ -23,7 +26,7 @@
 
   <header class="topbar">
     <div class="wrap">
-      <a class="brand" href="/" aria-label="本地 PDF 工具箱 首页">
+      <a class="brand" href="/" aria-label="本地 PDF 工具箱">
         <span class="seal-mark" aria-hidden="true"><span>本</span></span>
         <span><b>本地 PDF 工具箱</b><span class="sub mono">LOCAL · PDF · TOOLKIT</span></span>
       </a>
@@ -31,12 +34,12 @@
         <span class="dot" aria-hidden="true"></span>
         <span><span class="t-full">文件不上传 · </span>100% 本地处理</span>
       </span>
-      <nav class="links" aria-label="页面导航">
-        <a href="/#privacy">隐私</a><a href="/#how">原理</a><a href="/#faq">常见问题</a>
+      <nav class="links" aria-label="nav">
+        <a href="/#privacy">隐私</a><a href="/#how">原理</a><a href="/#faq">常见问题</a><a href="/en/split/" class="lang-switch">EN</a>
       </nav>
     </div>
   </header>
-  <a href="https://bodhi.tools" class="home-fab" aria-label="返回 bodhi.tools 主页">← bodhi.tools</a>
+  <a href="https://bodhi.tools" class="home-fab" aria-label="bodhi.tools">← bodhi.tools</a>
 
   <main class="wrap">
     <section class="hero hero-tool">
@@ -52,7 +55,7 @@
   </div>
     </section>
     
-  <nav class="tools-nav" aria-label="PDF 工具">
+  <nav class="tools-nav" aria-label="PDF tools">
     <a class="tn-item" href="/merge/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/><path d="M11 7h4a2 2 0 0 1 2 2v4"/></svg><span>合并</span></a>
     <a class="tn-item" href="/split/" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 12h16" stroke-dasharray="2 2"/></svg><span>拆分 / 提取</span></a>
     <a class="tn-item" href="/organize/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/></svg><span>页面整理</span></a>
@@ -62,10 +65,10 @@
     <a class="tn-item" href="/image-to-pdf/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg><span>图片转 PDF</span></a>
     <a class="tn-item" href="/extract-text/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14M5 10h14M5 15h9"/></svg><span>提取文字</span></a>
   </nav>
-    <section id="app" data-tool="split" aria-label="PDF 拆分 / 提取页面工具">
+    <section id="app" data-tool="split" aria-label="PDF 拆分 / 提取页面">
       <noscript><div class="workspace">本工具需开启 JavaScript 才能运行——这正是文件能在你本地处理、无需上传的原因。</div></noscript>
     </section>
-    <aside class="ad" aria-label="广告"><span class="ad-tag">广告位 · Ad Slot</span></aside>
+    <aside class="ad" aria-label="ad"><span class="ad-tag">广告位 · Ad Slot</span></aside>
     
   <section class="block" id="faq">
     <span class="kicker">FAQ</span>
@@ -91,7 +94,7 @@
       <a class="tool-card" href="/extract-text/"><span class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14M5 10h14M5 15h9"/></svg></span><span class="tc-tx"><b>提取文字</b><span class="tc-d">提取文字 / 转 TXT</span></span></a>
     </div>
   </section>
-    <aside class="ad" aria-label="广告"><span class="ad-tag">广告位 · Ad Slot</span></aside>
+    <aside class="ad" aria-label="ad"><span class="ad-tag">广告位 · Ad Slot</span></aside>
   </main>
 
   <footer class="site">
@@ -100,7 +103,7 @@
         <b>本地 PDF 工具箱</b>
         <p>一个把隐私放在第一位的免费 PDF 工具集，所有处理都在你的浏览器本地完成。</p>
       </div>
-      <nav aria-label="工具导航">
+      <nav aria-label="tools">
         <a href="/merge/">PDF 合并</a>
         <a href="/split/">PDF 拆分 / 提取页面</a>
         <a href="/organize/">PDF 页面整理</a>
@@ -110,7 +113,7 @@
         <a href="/image-to-pdf/">图片转 PDF</a>
         <a href="/extract-text/">PDF 提取文字</a>
       </nav>
-      <div class="copy mono">© <span id="year"></span> 本地 PDF 工具箱 · 文件不上传 · No file leaves your device.</div>
+      <div class="copy mono">© <span id="year"></span> 本地 PDF 工具箱 · No file leaves your device.</div>
     </div>
   </footer>
   <script type="module" src="/src/main.ts"></script>
