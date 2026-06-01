@@ -9,6 +9,7 @@ export interface Panel {
 }
 
 import { icons } from '../lib/icons';
+import { T } from '../lib/i18n';
 
 export function createPanel(title: string, desc: string): Panel {
   const root = document.createElement('div');
@@ -48,7 +49,7 @@ export function createPanel(title: string, desc: string): Panel {
       progress.classList.add('show');
       bar.style.width = `${Math.round(Math.min(1, Math.max(0, ratio)) * 100)}%`;
     },
-    showResult({ title: t, detail, onDownload, btnLabel = '下载结果' }) {
+    showResult({ title: t, detail, onDownload, btnLabel = T.downloadResult }) {
       result.innerHTML = `
         <span class="r-icon">${icons.check}</span>
         <div class="r-text"><b>${t}</b>${detail ? `<div class="r-detail">${detail}</div>` : ''}</div>

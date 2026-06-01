@@ -4,6 +4,68 @@ import { createPanel } from '../ui/panel';
 import { createDropzone } from '../ui/dropzone';
 import { icons } from '../lib/icons';
 import { downloadBlob, formatBytes, nextFrame, stripExt } from '../lib/format';
+import { L } from '../lib/i18n';
+
+const TX = {
+  zh: {
+    title: 'PDF 拆分 / 提取页面',
+    desc: '提取指定页码生成新 PDF，或把每一页拆成单独文件。',
+    dzTitle: '拖入一个 PDF，或点击选择',
+    dzHint: '仅支持 PDF · 文件不会上传',
+    reading: '正在读取…',
+    loaded: (name: string, n: number) => `已载入「${name}」，共 ${n} 页`,
+    readErr: '无法读取：该 PDF 可能已加密或文件已损坏',
+    btnExtract: '提取页面',
+    btnEach: '拆成单页并打包',
+    fieldMode: '拆分方式',
+    optExtract: '提取指定页面',
+    optEach: '每页拆成单独文件',
+    fieldRange: (n: number) => `页码范围（共 ${n} 页）`,
+    rangePlaceholder: '例如 1-3,5,8-10',
+    rangeHint: '逗号分隔、连字符表示区间',
+    extracting: '正在提取…',
+    extractDone: '提取完成',
+    extractResult: (n: number) => `已提取 ${n} 页`,
+    splitting: '正在拆分…',
+    splitDone: '拆分完成',
+    splitResult: (n: number) => `已拆成 ${n} 个单页 PDF`,
+    splitDetail: (size: string) => `打包为 ZIP · ${size}`,
+    downloadZip: '下载 ZIP',
+    fail: '处理失败',
+    badPage: (part: string) => `无法识别的页码：「${part}」`,
+    pageOutOfRange: (max: number, part: string) => `页码超出范围（共 ${max} 页）：「${part}」`,
+    emptyRange: '请填写要提取的页码',
+  },
+  en: {
+    title: 'Split / Extract PDF Pages',
+    desc: 'Extract specific pages into a new PDF, or split every page into a separate file.',
+    dzTitle: 'Drop a PDF, or click to choose',
+    dzHint: 'PDF only · never uploaded',
+    reading: 'Reading…',
+    loaded: (name: string, n: number) => `Loaded "${name}", ${n} pages`,
+    readErr: "Can't read this PDF: it may be encrypted or corrupted",
+    btnExtract: 'Extract Pages',
+    btnEach: 'Split & Zip',
+    fieldMode: 'Split mode',
+    optExtract: 'Extract pages',
+    optEach: 'One file per page',
+    fieldRange: (n: number) => `Page range (${n} pages total)`,
+    rangePlaceholder: 'e.g. 1-3,5,8-10',
+    rangeHint: 'Comma-separated, hyphen for ranges',
+    extracting: 'Extracting…',
+    extractDone: 'Extracted',
+    extractResult: (n: number) => `Extracted ${n} pages`,
+    splitting: 'Splitting…',
+    splitDone: 'Split done',
+    splitResult: (n: number) => `Split into ${n} single-page PDFs`,
+    splitDetail: (size: string) => `Zipped · ${size}`,
+    downloadZip: 'Download ZIP',
+    fail: 'Processing failed',
+    badPage: (part: string) => `Unrecognized page number: "${part}"`,
+    pageOutOfRange: (max: number, part: string) => `Page out of range (${max} pages total): "${part}"`,
+    emptyRange: 'Enter the pages to extract',
+  },
+}[L];
 
 const isPdf = (f: File) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
 
@@ -14,10 +76,10 @@ function parseRanges(input: string, max: number): number[] {
     const part = raw.trim();
     if (!part) continue;
     const m = part.match(/^(\d+)(?:[-－~](\d+))?$/);
-    if (!m) throw new Error(`无法识别的页码：「${part}」`);
+    if (!m) throw new Error(TX.badPage(part));
     let a = parseInt(m[1], 10);
     let b = m[2] ? parseInt(m[2], 10) : a;
-    if (a < 1 || b < 1 || a > max || b > max) throw new Error(`页码超出范围（共 ${max} 页）：「${part}」`);
+    if (a < 1 || b < 1 || a > max || b > max) throw new Error(TX.pageOutOfRange(max, part));
     if (a > b) [a, b] = [b, a];
     for (let p = a; p <= b; p++) {
       if (!seen.has(p)) {
@@ -26,12 +88,12 @@ function parseRanges(input: string, max: number): number[] {
       }
     }
   }
-  if (!out.length) throw new Error('请填写要提取的页码');
+  if (!out.length) throw new Error(TX.emptyRange);
   return out;
 }
 
 export function mountSplit(container: HTMLElement): void {
-  const panel = createPanel('PDF 拆分 / 提取页面', '提取指定页码生成新 PDF，或把每一页拆成单独文件。');
+  const panel = createPanel(TX.title, TX.desc);
 
   let srcBytes: ArrayBuffer | null = null;
   let pageCount = 0;
@@ -40,26 +102,26 @@ export function mountSplit(container: HTMLElement): void {
   const dz = createDropzone({
     accept: 'application/pdf',
     multiple: false,
-    title: '拖入一个 PDF，或点击选择',
-    hint: '仅支持 PDF · 文件不会上传',
+    title: TX.dzTitle,
+    hint: TX.dzHint,
     filter: isPdf,
     onFiles: async (fs) => {
       const f = fs[0];
       base = stripExt(f.name);
       panel.clearResult();
-      panel.setStatus('正在读取…');
+      panel.setStatus(TX.reading);
       try {
         const bytes = await f.arrayBuffer();
         const d = await PDFDocument.load(bytes);
         pageCount = d.getPageCount();
         srcBytes = bytes;
         showOptions();
-        panel.setStatus(`已载入「${f.name}」，共 ${pageCount} 页`, 'ok');
+        panel.setStatus(TX.loaded(f.name, pageCount), 'ok');
       } catch {
         srcBytes = null;
         opts.innerHTML = '';
         btn.disabled = true;
-        panel.setStatus('无法读取：该 PDF 可能已加密或文件已损坏', 'err');
+        panel.setStatus(TX.readErr, 'err');
       }
     },
   });
@@ -75,7 +137,7 @@ export function mountSplit(container: HTMLElement): void {
   let mode: 'extract' | 'each' = 'extract';
 
   function setBtnLabel() {
-    btn.innerHTML = `${icons.split}${mode === 'extract' ? '提取页面' : '拆成单页并打包'}`;
+    btn.innerHTML = `${icons.split}${mode === 'extract' ? TX.btnExtract : TX.btnEach}`;
   }
   setBtnLabel(); // 初始就显示文字(禁用态也要看得见,不能是空按钮)
 
@@ -83,16 +145,16 @@ export function mountSplit(container: HTMLElement): void {
     opts.innerHTML = `
       <div class="options">
         <div class="field">
-          <label>拆分方式</label>
+          <label>${TX.fieldMode}</label>
           <div class="segmented" id="mode">
-            <button type="button" data-m="extract" aria-pressed="true">提取指定页面</button>
-            <button type="button" data-m="each" aria-pressed="false">每页拆成单独文件</button>
+            <button type="button" data-m="extract" aria-pressed="true">${TX.optExtract}</button>
+            <button type="button" data-m="each" aria-pressed="false">${TX.optEach}</button>
           </div>
         </div>
         <div class="field" id="rangeField">
-          <label>页码范围（共 ${pageCount} 页）</label>
-          <input type="text" id="range" value="1-${pageCount}" placeholder="例如 1-3,5,8-10" />
-          <span class="hint">逗号分隔、连字符表示区间</span>
+          <label>${TX.fieldRange(pageCount)}</label>
+          <input type="text" id="range" value="1-${pageCount}" placeholder="${TX.rangePlaceholder}" />
+          <span class="hint">${TX.rangeHint}</span>
         </div>
       </div>
     `;
@@ -121,20 +183,20 @@ export function mountSplit(container: HTMLElement): void {
       if (mode === 'extract') {
         const rangeStr = (opts.querySelector('#range') as HTMLInputElement).value;
         const indices = parseRanges(rangeStr, pageCount);
-        panel.setStatus('正在提取…');
+        panel.setStatus(TX.extracting);
         const d = await PDFDocument.create();
         const pages = await d.copyPages(src, indices);
         pages.forEach((p) => d.addPage(p));
         const data = await d.save();
         const blob = new Blob([data as BlobPart], { type: 'application/pdf' });
-        panel.setStatus('提取完成', 'ok');
+        panel.setStatus(TX.extractDone, 'ok');
         panel.showResult({
-          title: `已提取 ${indices.length} 页`,
+          title: TX.extractResult(indices.length),
           detail: formatBytes(blob.size),
           onDownload: () => downloadBlob(blob, `${base}_提取${indices.length}页.pdf`),
         });
       } else {
-        panel.setStatus('正在拆分…');
+        panel.setStatus(TX.splitting);
         panel.setProgress(0);
         const zip = new JSZip();
         const pad = String(pageCount).length;
@@ -149,17 +211,17 @@ export function mountSplit(container: HTMLElement): void {
         }
         const blob = await zip.generateAsync({ type: 'blob' });
         panel.setProgress(null);
-        panel.setStatus('拆分完成', 'ok');
+        panel.setStatus(TX.splitDone, 'ok');
         panel.showResult({
-          title: `已拆成 ${pageCount} 个单页 PDF`,
-          detail: `打包为 ZIP · ${formatBytes(blob.size)}`,
+          title: TX.splitResult(pageCount),
+          detail: TX.splitDetail(formatBytes(blob.size)),
           onDownload: () => downloadBlob(blob, `${base}_单页拆分.zip`),
-          btnLabel: '下载 ZIP',
+          btnLabel: TX.downloadZip,
         });
       }
     } catch (e) {
       panel.setProgress(null);
-      panel.setStatus((e as Error).message || '处理失败', 'err');
+      panel.setStatus((e as Error).message || TX.fail, 'err');
     } finally {
       btn.disabled = false;
     }

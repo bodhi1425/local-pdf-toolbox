@@ -1,5 +1,6 @@
 import { icons } from '../lib/icons';
 import { formatBytes } from '../lib/format';
+import { T } from '../lib/i18n';
 
 export interface FileListEditor {
   el: HTMLElement;
@@ -20,8 +21,8 @@ export function createFileList(opts: { onChange?: () => void; reorder?: boolean 
       const li = document.createElement('li');
       li.className = 'filerow';
       const reorderBtns = opts.reorder
-        ? `<button class="iconbtn up" title="上移" ${i === 0 ? 'disabled' : ''}>${icons.up}</button>
-           <button class="iconbtn down" title="下移" ${i === files.length - 1 ? 'disabled' : ''}>${icons.down}</button>`
+        ? `<button class="iconbtn up" title="${T.up}" ${i === 0 ? 'disabled' : ''}>${icons.up}</button>
+           <button class="iconbtn down" title="${T.down}" ${i === files.length - 1 ? 'disabled' : ''}>${icons.down}</button>`
         : '';
       li.innerHTML = `
         <span class="idx mono">${String(i + 1).padStart(2, '0')}</span>
@@ -30,7 +31,7 @@ export function createFileList(opts: { onChange?: () => void; reorder?: boolean 
           <div class="name" title="${f.name}">${f.name}</div>
           <div class="size mono">${formatBytes(f.size)}</div>
         </span>
-        <span class="ops">${reorderBtns}<button class="iconbtn danger del" title="移除">${icons.trash}</button></span>
+        <span class="ops">${reorderBtns}<button class="iconbtn danger del" title="${T.remove}">${icons.trash}</button></span>
       `;
       li.querySelector('.del')?.addEventListener('click', () => {
         files.splice(i, 1);

@@ -4,6 +4,48 @@ import { createDropzone } from '../ui/dropzone';
 import { openWithPdfJs, renderPageToCanvas } from '../lib/pdfjs';
 import { icons } from '../lib/icons';
 import { downloadBlob, formatBytes, nextFrame, stripExt } from '../lib/format';
+import { L } from '../lib/i18n';
+
+const TX = {
+  zh: {
+    title: '页面整理',
+    desc: '旋转或删除页面，缩略图所见即所得，导出为新的 PDF。',
+    dzTitle: '拖入一个 PDF，或点击选择',
+    dzHint: '仅支持 PDF · 文件不会上传',
+    btn: '导出 PDF',
+    kept: (kept: number, total: number) => `保留 ${kept} / ${total} 页`,
+    thumbing: '正在生成缩略图…',
+    rotate: '旋转 90°',
+    del: '删除',
+    restore: '恢复',
+    loadErr: '无法读取：该 PDF 可能已加密或文件已损坏',
+    exporting: '正在导出…',
+    exportDone: '导出完成',
+    resultTitle: (n: number) => `已导出 ${n} 页`,
+    resultDetail: (deleted: number, rotated: number, size: string) =>
+      `${deleted} 页删除 · ${rotated} 页旋转 · ${size}`,
+    exportFail: '导出失败',
+  },
+  en: {
+    title: 'Organize Pages',
+    desc: 'Rotate or delete pages with live thumbnails, then export a new PDF.',
+    dzTitle: 'Drop a PDF, or click to choose',
+    dzHint: 'PDF only · never uploaded',
+    btn: 'Export PDF',
+    kept: (kept: number, total: number) => `Keeping ${kept} / ${total} pages`,
+    thumbing: 'Generating thumbnails…',
+    rotate: 'Rotate 90°',
+    del: 'Delete',
+    restore: 'Restore',
+    loadErr: "Can't read this PDF: it may be encrypted or corrupted",
+    exporting: 'Exporting…',
+    exportDone: 'Exported',
+    resultTitle: (n: number) => `Exported ${n} pages`,
+    resultDetail: (deleted: number, rotated: number, size: string) =>
+      `${deleted} deleted · ${rotated} rotated · ${size}`,
+    exportFail: 'Export failed',
+  },
+}[L];
 
 const isPdf = (f: File) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
 
@@ -13,7 +55,7 @@ interface PageState {
 }
 
 export function mountOrganize(container: HTMLElement): void {
-  const panel = createPanel('页面整理', '旋转或删除页面，缩略图所见即所得，导出为新的 PDF。');
+  const panel = createPanel(TX.title, TX.desc);
 
   let file: File | null = null;
   let base = 'document';
@@ -22,8 +64,8 @@ export function mountOrganize(container: HTMLElement): void {
   const dz = createDropzone({
     accept: 'application/pdf',
     multiple: false,
-    title: '拖入一个 PDF，或点击选择',
-    hint: '仅支持 PDF · 文件不会上传',
+    title: TX.dzTitle,
+    hint: TX.dzHint,
     filter: isPdf,
     onFiles: (fs) => {
       file = fs[0];
@@ -40,12 +82,12 @@ export function mountOrganize(container: HTMLElement): void {
   const btn = document.createElement('button');
   btn.className = 'btn btn-primary';
   btn.disabled = true;
-  btn.innerHTML = `${icons.pages}导出 PDF`;
+  btn.innerHTML = `${icons.pages}${TX.btn}`;
   panel.actions.appendChild(btn);
 
   const refreshCount = () => {
     const kept = states.filter((s) => !s.deleted).length;
-    panel.setStatus(`保留 ${kept} / ${states.length} 页`, kept ? 'ok' : 'err');
+    panel.setStatus(TX.kept(kept, states.length), kept ? 'ok' : 'err');
     btn.disabled = kept === 0;
   };
 
@@ -53,7 +95,7 @@ export function mountOrganize(container: HTMLElement): void {
     grid.innerHTML = '';
     states = [];
     btn.disabled = true;
-    panel.setStatus('正在生成缩略图…');
+    panel.setStatus(TX.thumbing);
     panel.setProgress(0);
     try {
       const buf = await file!.arrayBuffer();
@@ -75,7 +117,7 @@ export function mountOrganize(container: HTMLElement): void {
         badge.textContent = String(i);
         const ops = document.createElement('div');
         ops.className = 'pi-ops';
-        ops.innerHTML = `<button type="button" class="iconbtn rot" title="旋转 90°">${icons.rotate}</button><button type="button" class="iconbtn danger del" title="删除">${icons.trash}</button>`;
+        ops.innerHTML = `<button type="button" class="iconbtn rot" title="${TX.rotate}">${icons.rotate}</button><button type="button" class="iconbtn danger del" title="${TX.del}">${icons.trash}</button>`;
         item.append(frame, ops, badge);
         grid.appendChild(item);
 
@@ -86,7 +128,7 @@ export function mountOrganize(container: HTMLElement): void {
         ops.querySelector('.del')!.addEventListener('click', () => {
           states[idx].deleted = !states[idx].deleted;
           item.classList.toggle('deleted', states[idx].deleted);
-          (ops.querySelector('.del') as HTMLElement).title = states[idx].deleted ? '恢复' : '删除';
+          (ops.querySelector('.del') as HTMLElement).title = states[idx].deleted ? TX.restore : TX.del;
           refreshCount();
         });
 
@@ -98,7 +140,7 @@ export function mountOrganize(container: HTMLElement): void {
     } catch {
       panel.setProgress(null);
       grid.innerHTML = '';
-      panel.setStatus('无法读取：该 PDF 可能已加密或文件已损坏', 'err');
+      panel.setStatus(TX.loadErr, 'err');
     }
   }
 
@@ -108,7 +150,7 @@ export function mountOrganize(container: HTMLElement): void {
     if (!kept.length) return;
     btn.disabled = true;
     panel.clearResult();
-    panel.setStatus('正在导出…');
+    panel.setStatus(TX.exporting);
     try {
       const src = await PDFDocument.load(await file.arrayBuffer());
       const out = await PDFDocument.create();
@@ -121,14 +163,14 @@ export function mountOrganize(container: HTMLElement): void {
       const data = await out.save();
       const blob = new Blob([data as BlobPart], { type: 'application/pdf' });
       const rotated = kept.filter((o) => o.s.rotation).length;
-      panel.setStatus('导出完成', 'ok');
+      panel.setStatus(TX.exportDone, 'ok');
       panel.showResult({
-        title: `已导出 ${kept.length} 页`,
-        detail: `${states.length - kept.length} 页删除 · ${rotated} 页旋转 · ${formatBytes(blob.size)}`,
+        title: TX.resultTitle(kept.length),
+        detail: TX.resultDetail(states.length - kept.length, rotated, formatBytes(blob.size)),
         onDownload: () => downloadBlob(blob, `${base}_organized.pdf`),
       });
     } catch (e) {
-      panel.setStatus((e as Error).message || '导出失败', 'err');
+      panel.setStatus((e as Error).message || TX.exportFail, 'err');
     } finally {
       btn.disabled = false;
     }

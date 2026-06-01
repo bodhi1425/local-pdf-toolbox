@@ -4,18 +4,20 @@ import { createDropzone } from '../ui/dropzone';
 import { createFileList } from '../ui/filelist';
 import { icons } from '../lib/icons';
 import { downloadBlob, formatBytes, nextFrame } from '../lib/format';
+import { T } from '../lib/i18n';
 
 const isPdf = (f: File) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
 
 export function mountMerge(container: HTMLElement): void {
-  const panel = createPanel('PDF 合并', '把多个 PDF 按顺序合并为一个文件，可上下调整顺序。');
+  const M = T.merge;
+  const panel = createPanel(M.title, M.desc);
   const list = createFileList({ reorder: true, onChange: update });
 
   const dz = createDropzone({
     accept: 'application/pdf',
     multiple: true,
-    title: '拖入多个 PDF，或点击选择',
-    hint: '仅支持 PDF · 文件不会上传',
+    title: M.dzTitle,
+    hint: M.dzHint,
     filter: isPdf,
     onFiles: (fs) => {
       list.add(fs);
@@ -26,12 +28,12 @@ export function mountMerge(container: HTMLElement): void {
 
   const btn = document.createElement('button');
   btn.className = 'btn btn-primary';
-  btn.innerHTML = `${icons.merge}合并 PDF`;
+  btn.innerHTML = `${icons.merge}${M.btn}`;
   panel.actions.appendChild(btn);
 
   function update() {
     btn.disabled = list.count() < 2;
-    panel.setStatus(list.count() < 2 ? '至少需要 2 个 PDF 文件' : `${list.count()} 个文件待合并`);
+    panel.setStatus(list.count() < 2 ? M.need2 : M.pending(list.count()));
   }
   update();
 
@@ -40,7 +42,7 @@ export function mountMerge(container: HTMLElement): void {
     if (files.length < 2) return;
     btn.disabled = true;
     panel.clearResult();
-    panel.setStatus('正在合并…');
+    panel.setStatus(M.merging);
     panel.setProgress(0);
     try {
       const out = await PDFDocument.create();
@@ -50,7 +52,7 @@ export function mountMerge(container: HTMLElement): void {
         try {
           src = await PDFDocument.load(bytes);
         } catch {
-          throw new Error(`无法读取「${files[i].name}」：可能已加密或文件已损坏`);
+          throw new Error(M.loadErr(files[i].name));
         }
         const pages = await out.copyPages(src, src.getPageIndices());
         pages.forEach((p) => out.addPage(p));
@@ -60,15 +62,15 @@ export function mountMerge(container: HTMLElement): void {
       const data = await out.save();
       const blob = new Blob([data as BlobPart], { type: 'application/pdf' });
       panel.setProgress(null);
-      panel.setStatus('合并完成', 'ok');
+      panel.setStatus(M.done, 'ok');
       panel.showResult({
-        title: `已合并 ${files.length} 个文件，共 ${out.getPageCount()} 页`,
+        title: M.result(files.length, out.getPageCount()),
         detail: formatBytes(blob.size),
         onDownload: () => downloadBlob(blob, 'merged.pdf'),
       });
     } catch (e) {
       panel.setProgress(null);
-      panel.setStatus((e as Error).message || '合并失败', 'err');
+      panel.setStatus((e as Error).message || M.fail, 'err');
     } finally {
       btn.disabled = false;
     }

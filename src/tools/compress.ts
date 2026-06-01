@@ -4,6 +4,58 @@ import { createDropzone } from '../ui/dropzone';
 import { openWithPdfJs, renderPageToCanvas, pagePointSize } from '../lib/pdfjs';
 import { icons } from '../lib/icons';
 import { downloadBlob, formatBytes, canvasToBlob, nextFrame, stripExt } from '../lib/format';
+import { L } from '../lib/i18n';
+
+const TX = {
+  zh: {
+    title: 'PDF 压缩',
+    desc: '通过重新编码页面图像为 PDF 瘦身，扫描件、图片型 PDF 效果最佳。',
+    dzTitle: '拖入一个 PDF，或点击选择',
+    dzHint: '仅支持 PDF · 文件不会上传',
+    loaded: (name: string, size: string) => `已载入「${name}」（${size}）`,
+    strengthLabel: '压缩强度',
+    presetLow: '轻度',
+    presetMedium: '推荐',
+    presetHigh: '强力',
+    strengthHint: '强力体积最小、清晰度略降',
+    notice:
+      '压缩会把每一页转成图片重新编码，原本可选中、可搜索的文字将变为图片。如需保留文字图层，请改用其它工具或保留原文件。',
+    btn: '开始压缩',
+    compressing: '正在压缩…',
+    done: (pct: number) => `压缩完成，体积减少 ${pct}%`,
+    resultTitle: (from: string, to: string) => `${from} → ${to}`,
+    resultDetail: (pct: number, n: number) => `减少 ${pct}% · 共 ${n} 页`,
+    alreadySmall: '该 PDF 已较为精简，压缩后体积未减小',
+    alreadySmallTitle: (size: string) => `原文件 ${size} 已很精简`,
+    alreadySmallDetail: (size: string) => `压缩后约 ${size}，建议保留原文件`,
+    downloadAnyway: '仍要下载',
+    fail: '压缩失败，文件可能已加密或损坏',
+  },
+  en: {
+    title: 'Compress PDF',
+    desc: 'Shrink a PDF by re-encoding its page images — works best for scans and image-based PDFs.',
+    dzTitle: 'Drop a PDF, or click to choose',
+    dzHint: 'PDF only · never uploaded',
+    loaded: (name: string, size: string) => `Loaded "${name}" (${size})`,
+    strengthLabel: 'Compression level',
+    presetLow: 'Light',
+    presetMedium: 'Recommended',
+    presetHigh: 'Strong',
+    strengthHint: 'Strong gives the smallest size with slightly lower quality',
+    notice:
+      'Compression re-encodes every page as an image, so selectable, searchable text becomes a picture. To keep the text layer, use another tool or keep the original file.',
+    btn: 'Compress',
+    compressing: 'Compressing…',
+    done: (pct: number) => `Done — size reduced by ${pct}%`,
+    resultTitle: (from: string, to: string) => `${from} → ${to}`,
+    resultDetail: (pct: number, n: number) => `${pct}% smaller · ${n} pages`,
+    alreadySmall: 'This PDF is already lean — compression did not reduce its size',
+    alreadySmallTitle: (size: string) => `Original ${size} is already lean`,
+    alreadySmallDetail: (size: string) => `Compressed to about ${size} — keeping the original is recommended`,
+    downloadAnyway: 'Download anyway',
+    fail: 'Compression failed — the file may be encrypted or corrupted',
+  },
+}[L];
 
 const isPdf = (f: File) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
 
@@ -14,7 +66,7 @@ const PRESETS: Record<string, { scale: number; q: number }> = {
 };
 
 export function mountCompress(container: HTMLElement): void {
-  const panel = createPanel('PDF 压缩', '通过重新编码页面图像为 PDF 瘦身，扫描件、图片型 PDF 效果最佳。');
+  const panel = createPanel(TX.title, TX.desc);
 
   let file: File | null = null;
   let base = 'document';
@@ -23,15 +75,15 @@ export function mountCompress(container: HTMLElement): void {
   const dz = createDropzone({
     accept: 'application/pdf',
     multiple: false,
-    title: '拖入一个 PDF，或点击选择',
-    hint: '仅支持 PDF · 文件不会上传',
+    title: TX.dzTitle,
+    hint: TX.dzHint,
     filter: isPdf,
     onFiles: (fs) => {
       file = fs[0];
       base = stripExt(file.name);
       panel.clearResult();
       btn.disabled = false;
-      panel.setStatus(`已载入「${file.name}」（${formatBytes(file.size)}）`, 'ok');
+      panel.setStatus(TX.loaded(file.name, formatBytes(file.size)), 'ok');
     },
   });
 
@@ -39,16 +91,16 @@ export function mountCompress(container: HTMLElement): void {
   opts.innerHTML = `
     <div class="options">
       <div class="field">
-        <label>压缩强度</label>
+        <label>${TX.strengthLabel}</label>
         <div class="segmented" id="preset">
-          <button type="button" data-p="low" aria-pressed="false">轻度</button>
-          <button type="button" data-p="medium" aria-pressed="true">推荐</button>
-          <button type="button" data-p="high" aria-pressed="false">强力</button>
+          <button type="button" data-p="low" aria-pressed="false">${TX.presetLow}</button>
+          <button type="button" data-p="medium" aria-pressed="true">${TX.presetMedium}</button>
+          <button type="button" data-p="high" aria-pressed="false">${TX.presetHigh}</button>
         </div>
-        <span class="hint">强力体积最小、清晰度略降</span>
+        <span class="hint">${TX.strengthHint}</span>
       </div>
     </div>
-    <p class="notice">压缩会把每一页转成图片重新编码，原本可选中、可搜索的文字将变为图片。如需保留文字图层，请改用其它工具或保留原文件。</p>
+    <p class="notice">${TX.notice}</p>
   `;
   panel.body.append(dz, opts);
 
@@ -64,7 +116,7 @@ export function mountCompress(container: HTMLElement): void {
   const btn = document.createElement('button');
   btn.className = 'btn btn-primary';
   btn.disabled = true;
-  btn.innerHTML = `${icons.compress}开始压缩`;
+  btn.innerHTML = `${icons.compress}${TX.btn}`;
   panel.actions.appendChild(btn);
 
   btn.addEventListener('click', async () => {
@@ -73,7 +125,7 @@ export function mountCompress(container: HTMLElement): void {
     panel.clearResult();
     const { scale, q } = PRESETS[preset];
     const origSize = file.size;
-    panel.setStatus('正在压缩…');
+    panel.setStatus(TX.compressing);
     panel.setProgress(0);
     try {
       const buf = await file.arrayBuffer();
@@ -96,24 +148,24 @@ export function mountCompress(container: HTMLElement): void {
       const saved = origSize - blob.size;
       const pct = Math.round((saved / origSize) * 100);
       if (saved > 0) {
-        panel.setStatus(`压缩完成，体积减少 ${pct}%`, 'ok');
+        panel.setStatus(TX.done(pct), 'ok');
         panel.showResult({
-          title: `${formatBytes(origSize)} → ${formatBytes(blob.size)}`,
-          detail: `减少 ${pct}% · 共 ${n} 页`,
+          title: TX.resultTitle(formatBytes(origSize), formatBytes(blob.size)),
+          detail: TX.resultDetail(pct, n),
           onDownload: () => downloadBlob(blob, `${base}_compressed.pdf`),
         });
       } else {
-        panel.setStatus('该 PDF 已较为精简，压缩后体积未减小', 'err');
+        panel.setStatus(TX.alreadySmall, 'err');
         panel.showResult({
-          title: `原文件 ${formatBytes(origSize)} 已很精简`,
-          detail: `压缩后约 ${formatBytes(blob.size)}，建议保留原文件`,
+          title: TX.alreadySmallTitle(formatBytes(origSize)),
+          detail: TX.alreadySmallDetail(formatBytes(blob.size)),
           onDownload: () => downloadBlob(blob, `${base}_compressed.pdf`),
-          btnLabel: '仍要下载',
+          btnLabel: TX.downloadAnyway,
         });
       }
     } catch (e) {
       panel.setProgress(null);
-      panel.setStatus((e as Error).message || '压缩失败，文件可能已加密或损坏', 'err');
+      panel.setStatus((e as Error).message || TX.fail, 'err');
     } finally {
       btn.disabled = false;
     }
