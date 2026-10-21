@@ -25,6 +25,7 @@ const UI = {
     trustFull: '文件不上传 · ', trustShort: '100% 本地处理',
     nav: ['隐私', '原理', '常见问题'], faqTitle: '常见问题', allTools: '全部 PDF 工具',
     footerDesc: '一个把隐私放在第一位的免费 PDF 工具集，所有处理都在你的浏览器本地完成。',
+    source: '源代码',
     homeName: '首页', langLabel: 'EN', noscript: '本工具需开启 JavaScript 才能运行——这正是文件能在你本地处理、无需上传的原因。',
     heroKicker: 'FREE · NO UPLOAD · NO WATERMARK',
     heroLead: '合并、拆分、压缩、加水印、PDF 与图片互转、提取文字。全部在浏览器本地完成——文件不上传任何服务器，免费、无水印、不限次数。',
@@ -48,6 +49,7 @@ const UI = {
     trustFull: 'Files never uploaded · ', trustShort: '100% local',
     nav: ['Privacy', 'How', 'FAQ'], faqTitle: 'FAQ', allTools: 'All PDF tools',
     footerDesc: 'A privacy-first free PDF toolkit — everything runs locally in your browser.',
+    source: 'Source code',
     homeName: 'Home', langLabel: '中文', noscript: 'This tool needs JavaScript — which is exactly why files can be processed locally without uploading.',
     heroKicker: 'FREE · NO UPLOAD · NO WATERMARK',
     heroLead: 'Merge, split, compress, watermark, PDF ↔ image, extract text. All in your browser — files never uploaded to any server. Free, no watermark, unlimited.',
@@ -162,6 +164,7 @@ const footer = (lang) => `
       </div>
       <nav aria-label="tools">
         ${TOOLS.map((t) => `<a href="${pref(lang)}${t.path}">${tx(t, 'h1', lang)}</a>`).join('\n        ')}
+        <a href="https://github.com/bodhi1425/local-pdf-toolbox">${UI[lang].source}</a>
       </nav>
       <div class="copy mono">© <span id="year"></span> ${tx(SITE, 'name', lang)} · No file leaves your device.</div>
     </div>
