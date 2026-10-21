@@ -153,8 +153,6 @@ const faqSection = (faqs, lang) => `
     </div>
   </section>`;
 
-const adSlot = `<aside class="ad" aria-label="ad"><span class="ad-tag">广告位 · Ad Slot</span></aside>`;
-
 const footer = (lang) => `
   <footer class="site">
     <div class="wrap">
@@ -220,7 +218,6 @@ function buildHome(lang) {
       </div>
     </section>
     ${toolCards('', lang)}
-    ${adSlot}
     <section class="block" id="privacy">
       <span class="kicker">${u.whyKicker}</span>
       <h2>${u.whyTitle}</h2>
@@ -241,7 +238,6 @@ function buildHome(lang) {
       </div>
     </section>
     ${faqSection(sharedFaqs(lang), lang)}
-    ${adSlot}
   </main>`;
   return page(hero, {
     title: tx(HOME, 'title', lang), description: tx(HOME, 'description', lang), keywords: tx(HOME, 'keywords', lang),
@@ -267,10 +263,8 @@ function buildTool(tool, lang) {
     <section id="app" data-tool="${tool.id}" aria-label="${h1}">
       <noscript><div class="workspace">${UI[lang].noscript}</div></noscript>
     </section>
-    ${adSlot}
     ${faqSection(pageFaqs, lang)}
     ${toolCards(UI[lang].allTools, lang)}
-    ${adSlot}
   </main>`;
   return page(body, {
     title: tx(tool, 'title', lang), description: tx(tool, 'description', lang), keywords: tx(tool, 'keywords', lang),
