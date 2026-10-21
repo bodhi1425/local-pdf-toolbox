@@ -191,7 +191,7 @@ const page = (bodyInner, headOpts, lang) => `<!doctype html>
 </head>
 <body>
 ${header(lang, headOpts.path)}
-  <a href="https://bodhi.tools" class="home-fab" aria-label="bodhi.tools">← bodhi.tools</a>
+  <a href="https://bodhi.tools${lang === 'en' ? '/en/' : '/'}" class="home-fab" aria-label="bodhi.tools">← bodhi.tools</a>
 ${bodyInner}
 ${footer(lang)}
   <script type="module" src="/src/main.ts"></script>
